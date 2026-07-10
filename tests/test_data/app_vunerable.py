@@ -4,7 +4,7 @@ import requests
 
 # ❌ VULNERABILITY 1: Hardcoded Sensitive Information (CWE-798 / OWASP A07)
 # Real API keys or passwords should never be committed to code.
-STRIPE_API_KEY = "sk_live_51NzABC123456789xyzYOURSECRETAPIKEY"
+STRIPE_API_KEY = ""
 
 def get_db_connection():
     return sqlite3.connect('users.db')
