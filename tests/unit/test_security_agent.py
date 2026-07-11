@@ -210,6 +210,23 @@ class TestSecurityAgent:
         prompt = fake_llm.complete_calls[0]
         assert "src/views/login.py" in prompt
 
+    @pytest.mark.asyncio
+    async def test_prompt_redacts_secrets_and_labels_content_untrusted(self) -> None:
+        """The prompt is sanitized so secrets are redacted and untrusted content is labeled."""
+        fake_llm = FakeLLMService([])
+        retriever = SecurityRetriever(top_k=1)
+        retriever._query_chromadb = lambda _q: []
+        agent = SecurityAgent(llm=fake_llm, retriever=retriever)
+        code = 'api_key = "sk_live_1234567890abcdef"\nprint("hello")\n'
+        diff = '+api_key = "sk_live_1234567890abcdef"\n'
+
+        await agent.analyze(code, "app.py", {"diffs": {"app.py": diff}})
+
+        prompt = fake_llm.complete_calls[0]
+        assert "sk_live_1234567890abcdef" not in prompt
+        assert "<redacted>" in prompt
+        assert "untrusted" in prompt.lower()
+
     # ── BaseAgent.run() integration ───────────────────────────────────────
 
     @pytest.mark.asyncio
