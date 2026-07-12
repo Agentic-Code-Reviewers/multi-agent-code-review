@@ -15,6 +15,7 @@ from src.core.constants import AGENT_SECURITY
 from src.models.finding import Category, Finding
 from src.prompts.loader import render
 from src.services.llm_service import LLMService, get_llm_service
+from src.agents.dependency_resolver import stitch_context  # IMPORT STITCHER
 
 logger = logging.getLogger(__name__)
 
@@ -113,6 +114,22 @@ class SecurityAgent(BaseAnalysisAgent):
         sanitized_code = self._sanitize_content(code)
         sanitized_diff = self._sanitize_content(diff)
 
+        # 2. GRAPH-BASED CONTEXT STITCHING
+        # Resolve GitHub client and repository info if available in context
+        github_service = context.get("github_service")  # Passed from LangGraph orchestrator
+        repo_info = context.get("repo_info")            # e.g., {"owner": "x", "repo": "y", "ref": "feat-branch"}
+        files_dict = context.get("files", {})           # The in-memory dictionary of PR files
+        transient_cache = context.get("dependency_cache", {}) # shared transient cache
+
+        dependency_context = await stitch_context(
+            code=code,
+            file_path=file_path,
+            files_dict=files_dict,
+            github_service=github_service,
+            repo_info=repo_info,
+            transient_cache=transient_cache
+        )
+
         # 2. Render Template
         prompt = render(
             "security.j2",
@@ -121,6 +138,7 @@ class SecurityAgent(BaseAnalysisAgent):
             rag_context=rag_context,
             diff=sanitized_diff,
             triage_alerts=triage_alerts,
+            dependency_context=dependency_context,
         )
 
         # 3. LLM Execution

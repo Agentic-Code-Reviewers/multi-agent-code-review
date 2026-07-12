@@ -35,10 +35,17 @@ Local static analysis tools flagged the following potential structural anomalies
 
 {% endif %}
 {% endif %}
+{% if dependency_context %}
+**IMPORTED DEPENDENCY DEFINITIONS**:
+The following helper functions or classes are defined in other files within this repository. They are imported and called by this file. Use their implementations to evaluate data flow, sanitization routines, or vulnerability propagation:
+{{ dependency_context }}
+
+{% endif %}
 {% if diff %}
 Diff for this file:
 ```diff
 {{ diff }}
+```
 
 {% endif %}
 File: {{ file_path }}
