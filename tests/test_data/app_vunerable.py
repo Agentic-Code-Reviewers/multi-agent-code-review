@@ -23,12 +23,6 @@ def get_user_profile(username):
     conn.close()
     return user
 
-def ping_host(user_input_ip):
-    # ❌ VULNERABILITY 3: OS Command Injection (CWE-78 / OWASP A03)
-    # Passing raw user input directly to os.system allows attackers to execute system-level commands.
-    command = f"ping -c 1 {user_input_ip}"
-    os.system(command)
-
 # ❌ VULNERABILITY 4: Use of a Broken or Risky Cryptographic Algorithm (CWE-327 / OWASP A02)
 # MD5 is cryptographically broken and prone to collision attacks. It should never be used for password hashing.
 def hash_user_password(plain_password):
@@ -65,6 +59,6 @@ if __name__ == "__main__":
     print("Hashing password using MD5:", hash_user_password("super_secure_123"))
     
     # These would fail or trigger exploits in production:
-    # get_user_profile("admin' OR '1'='1")
-    # ping_host("8.8.8.8; cat /etc/passwd")
+    get_user_profile("admin' OR '1'='1")
+    ping_host("8.8.8.8; cat /etc/passwd")
     # read_user_file("../../../etc/passwd")
