@@ -471,7 +471,7 @@ async def _clone_review_branch(owner: str, repo: str, branch: str) -> str | None
 
     try:
         proc = await asyncio.create_subprocess_exec(
-            "git", "clone", "--depth", "1", "--branch", branch, "--single-branch", url, tmp_dir,
+            "git", "clone", "--branch", branch, "--single-branch", url, tmp_dir,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )

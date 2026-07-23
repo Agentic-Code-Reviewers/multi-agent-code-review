@@ -89,6 +89,7 @@ class Settings(BaseSettings):
     # ---- test gate ----
     enable_test_gate: bool = Field(default=False, description="Enable optional pytest gate before committing fixes")
     test_gate_timeout_secs: int = Field(default=120, description="Max seconds to wait for pytest to complete")
+    auto_install_test_deps: bool = Field(default=True, description="Auto-install missing dependencies from the cloned repo before running tests")
 
     # ---- derived / helpers ----
     @property
